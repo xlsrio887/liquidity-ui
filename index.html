@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidity Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+        }
+        pre {
+            text-align: left;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            display: inline-block;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h2>Liquidity Dashboard</h2>
+    <p>Введите адрес кошелька:</p>
+    <input type="text" id="wallet" placeholder="Wallet Address">
+    <button onclick="fetchData()">Показать</button>
+
+    <h3>Результат:</h3>
+    <pre id="result">Здесь появится информация...</pre>
+
+    <script>
+        async function fetchData() {
+            const wallet = document.getElementById("wallet").value;
+            const apiUrl = `https://liquidity-api.onrender.com/liquidity/${wallet}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Wallet not found");
+                const data = await response.json();
+                document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById("result").textContent = "Ошибка: " + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
