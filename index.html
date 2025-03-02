@@ -1,38 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liquidity Dashboard</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        input, button { padding: 10px; margin: 10px; }
-        pre { text-align: left; background: #f4f4f4; padding: 15px; border-radius: 5px; display: inline-block; max-width: 80%; word-wrap: break-word; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f5f5f5; }
+        .container { width: 60%; margin: auto; }
+        .card { background: #fff; border: 1px solid #ddd; padding: 15px; margin: 10px; border-radius: 8px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); }
+        .pool { background: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+        .highlight { font-weight: bold; }
     </style>
 </head>
 <body>
-    <h2>Liquidity Dashboard</h2>
-    <p>Введите адрес кошелька:</p>
-    <input type="text" id="wallet" placeholder="Wallet Address">
-    <button onclick="fetchData()">Показать</button>
 
-    <h3>Результат:</h3>
-    <pre id="result">Здесь появится информация...</pre>
+    <h2>Liquidity Dashboard</h2>
+    
+    <div class="container">
+        <div class="card">
+            <h3>💳 Wallet: <span id="wallet_address"></span></h3>
+            <p>📌 Pools: <span id="total_pools"></span> | 📊 SOL Price: $<span id="current_price"></span></p>
+            <p>💰 Total Liquidity: <span id="total_liquidity_sol"></span> SOL</p>
+            <p>🔄 Max SOL: <span id="max_sol_liquidity"></span> | Max USDC: <span id="max_usdc_liquidity"></span></p>
+        </div>
+
+        <h3>🏦 Active Pools</h3>
+        <div id="pools"></div>
+    </div>
 
     <script>
         async function fetchData() {
-            const wallet = document.getElementById("wallet").value;
-            const apiUrl = `https://liquidity-api.onrender.com/liquidity/${wallet}`;
-
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error("Wallet not found");
+                const response = await fetch('http://your-api-url/liquidity/HWn62BFk25Pd4A61tLjqUfeGvrwPZJXJ4XDzEv484YVU');
                 const data = await response.json();
-                document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+
+                document.getElementById('wallet_address').textContent = data.wallet_address;
+                document.getElementById('total_pools').textContent = data.total_pools;
+                document.getElementById('current_price').textContent = data.current_price;
+                document.getElementById('total_liquidity_sol').textContent = data.total_liquidity_sol;
+                document.getElementById('max_sol_liquidity').textContent = data.max_sol_liquidity;
+                document.getElementById('max_usdc_liquidity').textContent = data.max_usdc_liquidity;
+
+                let poolsHtml = "";
+                data.pools.forEach(pool => {
+                    poolsHtml += `
+                        <div class="pool">
+                            <h4>🔹 Pool ID: ${pool.pool_id} - ${pool.strategy}</h4>
+                            <p><span class="highlight">Execution Mode:</span> ${pool.execution_mode}</p>
+                            <p><span class="highlight">Market Condition:</span> ${pool.market_condition}</p>
+                            <p><span class="highlight">Range:</span> $${pool.range_low} - $${pool.range_high}</p>
+                            <p><span class="highlight">Liquidity:</span> ${pool.sol_liquidity} SOL | ${pool.usdc_liquidity} USDC</p>
+                            <p><span class="highlight">APR:</span> ${(pool.apr * 100).toFixed(2)}%</p>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('pools').innerHTML = poolsHtml;
             } catch (error) {
-                document.getElementById("result").textContent = "Ошибка: " + error.message;
+                document.getElementById('pools').innerHTML = `<p style="color: red;">Ошибка загрузки данных</p>`;
             }
         }
+
+        fetchData();
     </script>
+
 </body>
 </html>
