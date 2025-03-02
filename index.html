@@ -89,35 +89,26 @@
     </div>
 
     <script>
+        const API_URL = "https://your-real-api-url.onrender.com"; // Подставь свой реальный API
+
         async function fetchData() {
             const wallet = document.getElementById('wallet_input').value;
             if (!wallet) {
                 alert("Введите адрес кошелька!");
                 return;
             }
-
-            // Заменяем URL на твой реальный API на Render
-            const backendUrl = "https://your-backend-url.onrender.com";  
-
             try {
-                // Очищаем старые данные перед загрузкой новых
-                document.getElementById('dashboard').classList.add('hidden');
-                document.getElementById('pools').innerHTML = "";
-                
-                const response = await fetch(`${backendUrl}/liquidity/${wallet}`);
-
-                if (!response.ok) {
-                    throw new Error(`Ошибка: ${response.statusText}`);
-                }
+                const response = await fetch(`${API_URL}/liquidity/${wallet}`);
+                if (!response.ok) throw new Error("Ошибка API");
 
                 const data = await response.json();
 
                 document.getElementById('wallet_address').textContent = data.wallet_address;
                 document.getElementById('total_pools').textContent = data.total_pools;
-                document.getElementById('current_price').textContent = data.current_price;
-                document.getElementById('total_liquidity_sol').textContent = data.total_liquidity_sol;
-                document.getElementById('max_sol_liquidity').textContent = data.max_sol_liquidity;
-                document.getElementById('max_usdc_liquidity').textContent = data.max_usdc_liquidity;
+                document.getElementById('current_price').textContent = data.current_price.toFixed(2);
+                document.getElementById('total_liquidity_sol').textContent = data.total_liquidity_sol.toFixed(2);
+                document.getElementById('max_sol_liquidity').textContent = data.max_sol_liquidity.toFixed(2);
+                document.getElementById('max_usdc_liquidity').textContent = data.max_usdc_liquidity.toFixed(2);
 
                 let poolsHtml = "";
                 data.pools.forEach(pool => {
@@ -127,7 +118,7 @@
                             <p><b>Execution Mode:</b> ${pool.execution_mode}</p>
                             <p><b>Market Condition:</b> ${pool.market_condition}</p>
                             <p><b>Range:</b> $${pool.range_low} - $${pool.range_high}</p>
-                            <p><b>Liquidity:</b> ${pool.sol_liquidity} SOL | ${pool.usdc_liquidity} USDC</p>
+                            <p><b>Liquidity:</b> ${pool.sol_liquidity.toFixed(2)} SOL | ${pool.usdc_liquidity.toFixed(2)} USDC</p>
                             <p><b>APR:</b> ${(pool.apr * 100).toFixed(2)}%</p>
                         </div>
                     `;
@@ -136,7 +127,7 @@
                 document.getElementById('pools').innerHTML = poolsHtml;
                 document.getElementById('dashboard').classList.remove('hidden');
             } catch (error) {
-                alert("Ошибка загрузки данных: " + error.message);
+                alert("Ошибка загрузки данных");
             }
         }
     </script>
