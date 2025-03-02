@@ -95,8 +95,21 @@
                 alert("Введите адрес кошелька!");
                 return;
             }
+
+            // Заменяем URL на твой реальный API на Render
+            const backendUrl = "https://your-backend-url.onrender.com";  
+
             try {
-                const response = await fetch(`http://your-api-url/liquidity/${wallet}`);
+                // Очищаем старые данные перед загрузкой новых
+                document.getElementById('dashboard').classList.add('hidden');
+                document.getElementById('pools').innerHTML = "";
+                
+                const response = await fetch(`${backendUrl}/liquidity/${wallet}`);
+
+                if (!response.ok) {
+                    throw new Error(`Ошибка: ${response.statusText}`);
+                }
+
                 const data = await response.json();
 
                 document.getElementById('wallet_address').textContent = data.wallet_address;
@@ -123,7 +136,7 @@
                 document.getElementById('pools').innerHTML = poolsHtml;
                 document.getElementById('dashboard').classList.remove('hidden');
             } catch (error) {
-                alert("Ошибка загрузки данных");
+                alert("Ошибка загрузки данных: " + error.message);
             }
         }
     </script>
